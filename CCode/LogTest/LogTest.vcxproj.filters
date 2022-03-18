@@ -24,24 +24,12 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\Socket_Tools.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WorkingTools.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DeleteTM.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MinRoad.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="NineQueen.cpp">
+    <ClCompile Include="LogTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

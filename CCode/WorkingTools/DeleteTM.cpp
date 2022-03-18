@@ -64,7 +64,6 @@ void deleteTM()
 	for (auto address : list)
 	{
 		printf("%s\n",address.c_str());
-		Log(__FUNCTION__, "%s开始", address.c_str());
 		string file_name = "";
 		string addr = address + "\\*.*";
 		intptr_t handle = _findfirst(addr.c_str(), &FindData);
@@ -73,7 +72,6 @@ void deleteTM()
 			file_name = FindData.name;
 			if (validFileName(file_name))
 			{
-				Log(__FUNCTION__, "%s开始", file_name.c_str());
 				char cBuffer[256] = { 0 };
 				sprintf_s(cBuffer, sizeof(cBuffer), "%s\\%s", address.c_str(),file_name.c_str());
 				ifstream in(cBuffer, ios::in);
@@ -92,7 +90,7 @@ void deleteTM()
 				}
 				else
 				{
-					Log(__FUNCTION__, "%s\\%s未找到REVISIONS", address.c_str(), file_name.c_str());
+					
 				}
 			}
 		} while (!_findnext(handle, &FindData));

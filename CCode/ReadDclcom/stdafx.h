@@ -52,7 +52,7 @@ typedef struct NDD_struct{
 	NDD_struct* P_pre;
 	NDD_struct* P_next;
 	NDD_struct* P_inside;
-};
+}NDD_struct;
 
 typedef struct fast_struct{
 	string type_name;//类型
@@ -63,11 +63,11 @@ typedef struct fast_struct{
 	int type_class;//基本类型为1
 	int dimensions;//维度
 	int dim[3];//
-};
+}fast_struct;
 typedef struct NDD_vector{
 	NDD_struct type;
 	vector<NDD_struct> inside_vector;
-};
+}NDD_vector;
 typedef struct{
 	int value;
 	string element;

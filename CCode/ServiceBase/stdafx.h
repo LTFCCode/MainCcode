@@ -57,9 +57,6 @@ void Thread();
 
 void SharedMemoryClient();
 
-#ifndef _COMM_H__
-#define _COMM_H__
-#endif
 
 #define PATHNAME "."
 #define PROJ_ID 0x6666
@@ -73,8 +70,4 @@ DWORD StringToDword(string val);
 
 void AlarmLog(TCHAR *ProName, char *message, int status);
 void AlarmLog(TCHAR *ProName, DWORD message, int status);
-#ifndef First
-#define First
 
-#endif
-// TODO:  在此处引用程序需要的其他头文件

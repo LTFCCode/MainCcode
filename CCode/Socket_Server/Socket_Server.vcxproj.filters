@@ -38,5 +38,11 @@
     <ClCompile Include="Server_Tools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Init.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WriteLog.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

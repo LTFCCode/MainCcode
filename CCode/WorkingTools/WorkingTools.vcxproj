@@ -41,8 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ReferencePath>E:\CCode\ServiceDemo\CCode\Include;$(ReferencePath)</ReferencePath>
-    <IncludePath>E:\CCode\ServiceDemo\CCode\Include;$(IncludePath)</IncludePath>
+    <ReferencePath>E:\CCodeSSH\CCode\Include;$(ReferencePath)</ReferencePath>
+    <IncludePath>E:\CCodeSSH\CCode\Include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)build\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,20 +82,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\ToolsLib.h" />
-    <ClInclude Include="..\Include\TString.h" />
+    <ClInclude Include="..\Include\Socket_Tools.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CompareEnum.cpp" />
     <ClCompile Include="DeleteTM.cpp" />
-    <ClCompile Include="Ftpjson.cpp" />
-    <ClCompile Include="HanoiTower.cpp" />
-    <ClCompile Include="LoadConfig.cpp" />
     <ClCompile Include="MinRoad.cpp" />
     <ClCompile Include="NineQueen.cpp" />
-    <ClCompile Include="ReadExcel.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

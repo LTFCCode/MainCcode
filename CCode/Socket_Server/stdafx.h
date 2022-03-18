@@ -9,19 +9,8 @@
 using namespace std;
 #include "targetver.h"
 
-#include <stdio.h>
-#include <tchar.h>
-#include<sys/types.h>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <thread>
-#include<vector>
-#include<list>
-#include <map>
-#include<mutex>
-
 #include "Socket_Tools.h"
 
+void init_Server();
 void start();
 // TODO:  在此处引用程序需要的其他头文件

@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+extern HANDLE hMapLogFile;
+extern LPVOID Log_lpBase;
+extern HANDLE WaitHandle[5];
+extern sLOG *Log;
+
 void start()
 {
 	WSADATA wsaData;
@@ -26,7 +31,7 @@ void start()
 	printf("Username:");
 	scanf("%s", SysInfo.UserName);
 
-	HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, "ShareMemory");
+	HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, SOCKETSHAREMEMORY);
 
 
 	if (hMapFile) {

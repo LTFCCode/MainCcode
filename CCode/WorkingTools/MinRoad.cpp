@@ -434,7 +434,6 @@ void cCity::showcity()
 	{
 		i++;
 		printf("建筑%d:(%0.2f,%0.2f,%0.2f)\n",i,buliding.address.x,buliding.address.y,buliding.radis);
-		Log(__FUNCTION__, "建筑%d:(%f,%f,%f)", i, buliding.address.x, buliding.address.y, buliding.radis);
 		out  << buliding.address.x<<","<< buliding.address.y<<","<< buliding.radis<< endl;
 	}
 	out.close();
@@ -849,8 +848,6 @@ sBuliding cCity::GetFirst(sAddress start)
 			}
 		}
 	}
-	Log(__FUNCTION__, "起点(%f,%f)\tFirstBuliding(%f,%f,%f)", start.x, start.y, 
-		buliding_result.address.x, buliding_result.address.y,buliding_result.radis);
 	return buliding_result;
 }
 std::tuple<sTangentline, sTangentline>  cCity::GetTangent(sAddress aim, sBuliding buliding)
@@ -907,7 +904,6 @@ std::tuple<sAddress, sAddress> cCity::cycle(sAddress start)
 {
 	sAddress point1, point2;
 	std::tie(point1, point2) = this->GetNext(start);
-	Log(__FUNCTION__, "Next(%f,%f)\t(%f,%f)\t(%f,%f)", start.x, start.y, point1.x, point1.y, point2.x, point2.y);
 	return std::make_tuple(std::move(point1), std::move(point2));;
 }
 void cCity::cycle(sRoad* road)

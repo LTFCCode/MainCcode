@@ -1,7 +1,15 @@
 #include "stdafx.h"
+#include "Socket_Tools.h"
+
+
 int client_num = 0;
 datatype *data = new datatype;
 LPVOID lpBase;
+
+extern HANDLE hMapLogFile;
+extern LPVOID Log_lpBase;
+extern HANDLE WaitHandle[5];
+extern sLOG *Log;
 const char * inet_ntop(int family, const void *addrptr, char *strptr, size_t len)
 {
 	const u_char *p = (const u_char *)addrptr;
@@ -24,7 +32,7 @@ void Accpet_Thread(SOCKET socket_client)
 	int result;
 	SysInfo.recever = socket_client;
 	datatype* client_data = nullptr;
-	HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, "ShareMemory");
+	HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, SOCKETSHAREMEMORY);
 
 	if (hMapFile) {
 		LPVOID client_lpBase = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
@@ -46,8 +54,10 @@ void Accpet_Thread(SOCKET socket_client)
 
 			break;
 		}
-		printf("%s\t%d:%d:%d:%d\t%s\n", SysInfo.UserName, SysInfo.sendtime.wHour, SysInfo.sendtime.wMinute, SysInfo.sendtime.wSecond, SysInfo.sendtime.wMilliseconds,
+		sprintf(Log->data, "%s\t%d:%d:%d:%d\t%s\n", SysInfo.UserName, SysInfo.sendtime.wHour, SysInfo.sendtime.wMinute, SysInfo.sendtime.wSecond, SysInfo.sendtime.wMilliseconds,
 			client_data->s_data);
+		printf("%s\n", Log->data);
+		writelog(__FUNCTION__,Log->data);
 		GetLocalTime(&SysInfo.revtime);
 		send(socket_client, (char *)&SysInfo, sizeof(dSysInfo), 0);
 	}
@@ -56,30 +66,6 @@ void Accpet_Thread(SOCKET socket_client)
 void start()
 {
 	printf("AddSocket线程启动\n");
-
-	// 定义共享数据
-	datatype *data = new datatype;
-	for (int i = 0; i < 100;i++)
-	{
-		data->i_data[i] = i;
-		data->f_data[i] = 0.1f + i;
-	}
-	strcpy(data->s_data,"test");
-
-	HANDLE hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE,NULL,PAGE_READWRITE,0,sizeof(datatype),"ShareMemory");
-
-
-	lpBase = MapViewOfFile(hMapFile,FILE_MAP_ALL_ACCESS,0,0,sizeof(datatype));
-
-
-	lpBase = (void*)data;
-
-	HANDLE hMapFile_test = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, "ShareMemory");
-	if (hMapFile_test) {
-		LPVOID client_lpBase = MapViewOfFile(hMapFile_test, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-		client_lpBase = (void*)data;
-	}
-
 
 	WSADATA wsaData;
 	char ipClient[16];
@@ -114,7 +100,4 @@ void start()
 		accept_thread.detach();
 	}
 
-	UnmapViewOfFile(lpBase);
-
-	CloseHandle(hMapFile);
 }
