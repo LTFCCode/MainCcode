@@ -20,7 +20,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	//testreturn();
 	//HanoiTower();
 	//deleteTM();
-	MinRoad();
+	//MinRoad();
+	CalCtcDis();
 	system("pause");
 	return 0;
 	return 0;

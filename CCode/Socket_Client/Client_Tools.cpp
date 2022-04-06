@@ -5,7 +5,7 @@ extern LPVOID Log_lpBase;
 extern HANDLE WaitHandle[5];
 extern sLOG *Log;
 
-void start()
+void Client()
 {
 	WSADATA wsaData;
 	string IpAddress;
@@ -46,7 +46,8 @@ void start()
 		lpBase = (void*)&data;
 		send(SysInfo.sender, (char *)&SysInfo, sizeof(dSysInfo), 0);
 		recv(SysInfo.sender, (char *)&SysInfo, sizeof(dSysInfo), 0);
-		printf("%s\t%d:%d:%d:%d\n", SysInfo.UserName, SysInfo.revtime.wHour, SysInfo.revtime.wMinute, SysInfo.revtime.wSecond, SysInfo.revtime.wMilliseconds);
+		sprintf(Log->data, data->s_data);
+		writelog(Log->data, __FUNCTION__);
 		system("pause");
 	}
 

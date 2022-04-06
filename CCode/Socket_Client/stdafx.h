@@ -15,6 +15,6 @@
 #include "Socket_Tools.h"
 using namespace std;
 
-void start();
+void Client();
 void init_Client();
 // TODO:  在此处引用程序需要的其他头文件

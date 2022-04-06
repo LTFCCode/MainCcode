@@ -3,18 +3,128 @@
 
 #include "stdafx.h"
 #include "Socket_Tools.h"
+#define SERVICE_NAME "LOG"
 
-int _tmain(int argc, _TCHAR* argv[])
+#define SLEEP_TIME 5000 //间隔时间
+
+#define FILE_PATH "C:\\log.txt" //信息输出文件
+
+bool brun = false;
+int Log();
+SERVICE_STATUS servicestatus;
+
+SERVICE_STATUS_HANDLE hstatus;
+
+int WriteToLog(char* str);
+
+void WINAPI ServiceMain(int argc, char** argv);
+
+void WINAPI CtrlHandler(DWORD request);
+
+int InitService();
+
+int WriteToLog(char* str)
+
 {
+	FILE* pfile;
+	fopen_s(&pfile, FILE_PATH, "a+");
+	if (pfile == NULL)
+	{
+		return -1;
+	}
+	fprintf_s(pfile, "%s\n", str);
+	fclose(pfile);
+	return 0;
+}
+
+void WINAPI ServiceMain(int argc, char** argv)
+{
+	servicestatus.dwServiceType = SERVICE_WIN32;
+	servicestatus.dwCurrentState = SERVICE_START_PENDING;
+	servicestatus.dwControlsAccepted = SERVICE_ACCEPT_SHUTDOWN | SERVICE_ACCEPT_STOP;//在本例中只接受系统关机和停止服务两种控制命令
+	servicestatus.dwWin32ExitCode = 0;
+	servicestatus.dwServiceSpecificExitCode = 0;
+	servicestatus.dwCheckPoint = 0;
+	servicestatus.dwWaitHint = 0;
+	hstatus = ::RegisterServiceCtrlHandler(SERVICE_NAME, CtrlHandler);
+	if (hstatus == 0)
+	{
+		WriteToLog("RegisterServiceCtrlHandler failed");
+		return;
+	}
+	WriteToLog("RegisterServiceCtrlHandler success");
+	//向SCM 报告运行状态
+	servicestatus.dwCurrentState = SERVICE_RUNNING;
+	SetServiceStatus(hstatus, &servicestatus);	
+	Log();
+	WriteToLog("service stopped");
+}
+
+void WINAPI CtrlHandler(DWORD request)
+{
+
+	switch (request)
+	{
+	case SERVICE_CONTROL_STOP:
+
+		brun = false;
+
+		servicestatus.dwCurrentState = SERVICE_STOPPED;
+
+		break;
+
+	case SERVICE_CONTROL_SHUTDOWN:
+
+		brun = false;
+
+		servicestatus.dwCurrentState = SERVICE_STOPPED;
+
+		break;
+
+	default:
+
+		break;
+
+	}
+
+	SetServiceStatus(hstatus, &servicestatus);
+}
+
+void main()
+{
+
+	SERVICE_TABLE_ENTRY entrytable[2];
+
+	entrytable[0].lpServiceName = SERVICE_NAME;
+
+	entrytable[0].lpServiceProc = (LPSERVICE_MAIN_FUNCTION)ServiceMain;
+
+	entrytable[1].lpServiceName = NULL;
+
+	entrytable[1].lpServiceProc = NULL;
+
+	StartServiceCtrlDispatcher(entrytable);
+
+}
+int Log()
+{
+	WriteToLog("进入Log");
 	DWORD   dwIndex;
-	HANDLE	WaitHandle[EVENTSIZE];
 	HANDLE hGetEvent[EVENTSIZE];
 
-	WaitHandle[0] = CreateEvent(NULL, FALSE, FALSE, "Global\\HF");//参数二 TRUE人工复位，FALSE 接到触发后自动复位
-	WaitHandle[1] = CreateEvent(NULL, FALSE, FALSE, "Global\\HS");//参数三 TRUE 初始化置位  FALSE初始化不置位
-	WaitHandle[2] = CreateEvent(NULL, FALSE, FALSE, "Global\\Alarm");
-	WaitHandle[3] = CreateEvent(NULL, FALSE, FALSE, "Global\\Vector");
-	WaitHandle[4] = CreateEvent(NULL, FALSE, FALSE, "Global\\LOG");
+	SECURITY_DESCRIPTOR sd;
+	::InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
+	::SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
+	SECURITY_ATTRIBUTES sa;
+	sa.nLength = sizeof(sa);
+	sa.bInheritHandle = FALSE;
+	sa.lpSecurityDescriptor = &sd;
+
+	::CreateEvent(&sa, FALSE, FALSE, "Global\\HF");//参数二 TRUE人工复位，FALSE 接到触发后自动复位
+	::CreateEvent(&sa, FALSE, FALSE, "Global\\HS");//参数三 TRUE 初始化置位  FALSE初始化不置位
+	::CreateEvent(&sa, FALSE, FALSE, "Global\\Alarm");
+	::CreateEvent(&sa, FALSE, FALSE, "Global\\Vector");
+	::CreateEvent(&sa, FALSE, FALSE, "Global\\LOG");
 
 	hGetEvent[0] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\HF");
 	hGetEvent[1] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\HS");
@@ -22,23 +132,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	hGetEvent[3] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\Vector");
 	hGetEvent[4] = OpenEvent(EVENT_ALL_ACCESS, FALSE, "Global\\LOG");
 
-	CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, BUF_SIZE, SOCKETSHAREMEMORY);
-	CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, BUF_SIZE, LOGSHAREMEMORY);
-	CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, BUF_SIZE, "VectorShareMemory");
-
-	HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, LOGSHAREMEMORY);
-	LPVOID client_lpBase;
-
-
 	if (::GetFileAttributes(LOGADDRESS) == 0xFFFFFFFF)
 	{
-		printf("%s不存在\n", LOGADDRESS);
+		WriteToLog("1不存在");
 		if (!::CreateDirectory(LOGADDRESS, NULL))
 		{
 		}
 		else
 		{
-			printf("%s创建成功\n", LOGADDRESS);
+			WriteToLog("1创建成功");
 		}
 	}
 	TCHAR AimDir[MAX_PATH];
@@ -48,64 +150,69 @@ int _tmain(int argc, _TCHAR* argv[])
 	_stprintf_s(AimDir, MAX_PATH, _T("%s\\%04d-%02d-%02d.txt"), LOGADDRESS, FileTime.wYear, FileTime.wMonth, FileTime.wDay);
 	if (::GetFileAttributes(AimDir) == 0xFFFFFFFF)
 	{
-		printf("%s不存在\n", AimDir);
+		WriteToLog("2不存在");
 		if (!::GetFileAttributes(AimDir))
 		{
 		}
 		else
 		{
-			printf("%s创建成功\n", AimDir);
+			WriteToLog("2创建成功");
 		}
 	}
 
+
+	HANDLE hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, NULL, "LogShareMemory");
+	LPVOID client_lpBase;
 	FILE* fp = nullptr;
 
 	if (hMapFile)
 	{
+		WriteToLog("创建成功");
 		client_lpBase = MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+		if (client_lpBase)
+		{
+			WriteToLog("map成功");
+		}
+	}
+	else
+	{
+		WriteToLog((char*)GetLastError());
+		WriteToLog("创建失败");
 	}
 	sLOG* test = ((sLOG*)client_lpBase);
 	while (true)
 	{
-		dwIndex = WaitForMultipleObjects(EVENTSIZE, WaitHandle, FALSE, INFINITE);
+		WriteToLog("进入循环");
+		dwIndex = WaitForMultipleObjects(EVENTSIZE, hGetEvent, FALSE, INFINITE);
 		switch (dwIndex)
 		{
 		case WAIT_TIMEOUT:
-			printf("对象保持未发信号的状态，但规定的等待超时时间已经超过\n");
+			WriteToLog("超时");
 			break;
 		case WAIT_FAILED:
-			printf("%s\n",GetLastError());
+			WriteToLog((char*)GetLastError());
 			break;
 		case WAIT_OBJECT_0:
-			printf("信号一触发\n");
-			printf("%s\t%s\n", test->sender, test->data);
 			break;
 		case WAIT_OBJECT_0 +1:
-			printf("信号二触发\n");
-			printf("%s\t%s\n", test->sender, test->data);
 			break;
 		case WAIT_OBJECT_0 +2:
-			printf("信号三触发\n");
-			printf("%s\t%s\n", test->sender, test->data);
 			break;
 		case WAIT_OBJECT_0 +3:
-			printf("信号四触发\n");
-			printf("%s\t%s\n", test->sender, test->data);
 			break;
 		case WAIT_OBJECT_0 +4:
-			printf("信号五触发\n");
-			printf("%s\t%d:%d:%d:%d\t%s\n", test->sender, test->sendtime.wHour, test->sendtime.wMinute, test->sendtime.wSecond, 
-				test->sendtime.wMilliseconds,test->data);
+			WriteToLog("信号五触发");
 			_tfopen_s(&fp, AimDir, _T("a+"));
 			if (fp != nullptr)
 			{
+				WriteToLog("打开日志文件成功");
 				_ftprintf_s(fp, "%s\t%d:%d:%d:%d\t%s\n", test->sender, test->sendtime.wHour, test->sendtime.wMinute, test->sendtime.wSecond,
 					test->sendtime.wMilliseconds, test->data);
 				fclose(fp);
 			}
 			else
 			{
-				printf("打开日志文件失败 %s\n",AimDir);
+				WriteToLog("打开日志文件失败");
 			}
 			break;
 		default:
@@ -113,7 +220,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}
 	fclose(fp);
-	system("pause");
 	return 0;
+
 }
 

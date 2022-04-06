@@ -20,6 +20,7 @@
 #include <io.h>
 #include <random>
 #include <algorithm> //sort
+#include <Windows.h>
 using namespace std;
 #pragma comment(lib,"ws2_32.lib")
 #define SERVER_IP "192.168.100.80"
@@ -28,10 +29,10 @@ using namespace std;
 #define NAMESIZE 24
 #define BUF_SIZE 838860
 #define SOCKETSHAREMEMORY "SocketShareMemory"
-#define LOGSHAREMEMORY "LogShareMemory"
+#define LOGSHAREMEMORY "Global\\LogShareMemory"
 #define LOGADDRESS "E:\\CCodeSSH\\Log"
 #define EVENTSIZE 5
-
+map <int, int> test;
 typedef struct
 {
 	int i_data[100];

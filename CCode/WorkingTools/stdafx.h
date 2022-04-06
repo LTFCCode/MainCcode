@@ -8,4 +8,5 @@
 void NineQueenQues();
 void deleteTM();
 void MinRoad();
+void CalCtcDis();
 

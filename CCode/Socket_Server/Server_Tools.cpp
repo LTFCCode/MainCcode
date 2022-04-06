@@ -46,7 +46,7 @@ void Accpet_Thread(SOCKET socket_client)
 			switch (result)
 			{
 			case -1:
-				printf("%s 断开连接,其余连接数:%d\n", SysInfo.UserName, result);
+				printf("%s 断开连接,其余连接数:%d\n", SysInfo.UserName, client_num);
 				closesocket(socket_client);
 				client_num--;
 				break;
@@ -57,13 +57,13 @@ void Accpet_Thread(SOCKET socket_client)
 		sprintf(Log->data, "%s\t%d:%d:%d:%d\t%s\n", SysInfo.UserName, SysInfo.sendtime.wHour, SysInfo.sendtime.wMinute, SysInfo.sendtime.wSecond, SysInfo.sendtime.wMilliseconds,
 			client_data->s_data);
 		printf("%s\n", Log->data);
-		writelog(__FUNCTION__,Log->data);
+		writelog(Log->data, __FUNCTION__);
 		GetLocalTime(&SysInfo.revtime);
 		send(socket_client, (char *)&SysInfo, sizeof(dSysInfo), 0);
 	}
 }
 
-void start()
+void Server()
 {
 	printf("AddSocket线程启动\n");
 
@@ -100,4 +100,81 @@ void start()
 		accept_thread.detach();
 	}
 
+}
+void SocketText()
+{
+	WSADATA wsaData;
+	char ipClient[16];
+	sockaddr_in clientAddr = { 0 };
+	int nSize = sizeof(SOCKADDR);
+	int result;
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+	SOCKET socket_server = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	sockaddr_in sockaddr;
+	sockaddr.sin_family = PF_INET;
+	sockaddr.sin_addr.S_un.S_addr = inet_addr("192.168.22.104");
+	sockaddr.sin_port = htons(5432);
+	::bind(socket_server, (SOCKADDR*)&sockaddr, sizeof(sockaddr));
+	int rev = listen(socket_server, 10);
+	if (rev == SOCKET_ERROR)
+	{
+		printf("侦听失败\n");
+		closesocket(socket_server);
+	}
+	while (true)
+	{
+		SOCKET socket_client = accept(socket_server, (struct sockaddr*)&clientAddr, &nSize);
+		if (socket_client == INVALID_SOCKET)
+		{
+			printf("无效socket\n");
+			continue;;
+		}
+		inet_ntop(AF_INET, &clientAddr.sin_addr, ipClient, sizeof(ipClient));
+		printf("收到%s访问\n", ipClient);
+
+		send(socket_client, "Connect Success\n\r", sizeof("Connect Success\n\r"), 0);
+
+		send(socket_client, "password:", sizeof("password:"), 0);
+		char data[24] = "";
+		while (true)
+		{
+			char recev;
+			result = recv(socket_client, (char *)&recev, sizeof(recev), 0);
+			if (result <= 0)
+			{
+				switch (result)
+				{
+				case -1:
+					printf("Client Close\n");
+					closesocket(socket_client);
+					break;
+				}
+
+				break;
+			}
+			if (recev == '\r')
+			{
+				printf("收到\\r\n");
+			}
+			else if (recev == '\n')
+			{
+				printf("收到\\n\n");
+				printf("%s/n",data);
+				if (strcmp(data,"liu172")==0)
+				{
+					send(socket_client, "\r\nLoad Success\r\n", sizeof("\r\nLoad Success\r\n"), 0);
+				}
+				else
+				{
+					send(socket_client, "\r\nERROR PASSWORD\r\n", sizeof("\r\nERROR PASSWORD\r\n"), 0);
+					send(socket_client, "password:", sizeof("password:"), 0);
+				}
+				sprintf(data, "");
+			}
+			else
+			{
+				sprintf(data, "%s%c", data,recev);
+			}
+		}
+	}
 }

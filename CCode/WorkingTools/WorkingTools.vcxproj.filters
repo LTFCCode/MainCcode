@@ -44,5 +44,8 @@
     <ClCompile Include="NineQueen.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CalculateCtcDis.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

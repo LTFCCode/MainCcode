@@ -10,8 +10,9 @@ sLOG *Log;
 int _tmain(int argc, _TCHAR* argv[])
 {
 
-	init_Server();
-	start();
+	//init_Server();
+	//Server();
+	SocketText();
 	system("pause");
 	return 0;
 }

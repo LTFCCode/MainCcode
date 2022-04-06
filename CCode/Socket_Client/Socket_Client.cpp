@@ -10,7 +10,7 @@ sLOG *Log;
 int _tmain(int argc, _TCHAR* argv[])
 {
 	init_Client();
-	start();
+	Client();
 	return 0;
 }
 
